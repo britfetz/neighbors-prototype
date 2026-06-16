@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Neighbors — Scan to open</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root{--purple:#7B2FF5;--lime:#B4E84A;--ink:#1d1d1f;}
+  *{box-sizing:border-box;margin:0;}
+  body{font-family:'Fredoka',-apple-system,sans-serif;background:#fff;color:var(--ink);
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:40px;}
+  .wordmark{font-weight:700;font-size:54px;letter-spacing:-1.5px;color:var(--purple);}
+  .wordmark .dot{color:var(--lime);}
+  .tagline{font-size:20px;color:#3a3a3a;margin-top:4px;}
+  h1{font-weight:600;font-size:34px;margin:38px 0 6px;}
+  p.sub{font-size:19px;color:#5a5e72;font-weight:400;max-width:520px;}
+  .qrbox{margin:34px 0 24px;padding:26px;background:#fff;border:3px solid #eee;border-radius:28px;
+    box-shadow:0 16px 50px rgba(0,0,0,.10);}
+  #qr img{display:block;}
+  .url{font-family:monospace;font-size:18px;background:#F6FAED;border:1.5px solid #e4eccf;
+    border-radius:12px;padding:12px 20px;color:var(--ink);}
+  .steps{display:flex;gap:30px;margin-top:34px;flex-wrap:wrap;justify-content:center;}
+  .step{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:500;}
+  .num{width:34px;height:34px;border-radius:50%;background:var(--purple);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:600;}
+</style>
+</head>
+<body>
+  <div class="wordmark">neighbors<span class="dot">.</span></div>
+  <div class="tagline">The digital knock on your neighbor's door</div>
+
+  <h1>Scan to open on your phone</h1>
+  <p class="sub">Point your phone camera at the code — no app, no sign-up. Allow camera access to try the package scanner.</p>
+
+  <div class="qrbox"><div id="qr"></div></div>
+  <div class="url">britfetz.github.io/neighbors-prototype</div>
+
+  <div class="steps">
+    <div class="step"><span class="num">1</span> Open your camera</div>
+    <div class="step"><span class="num">2</span> Point it at the code</div>
+    <div class="step"><span class="num">3</span> Tap the link that pops up</div>
+  </div>
+
+<script>
+  new QRCode(document.getElementById("qr"), {
+    text: "https://britfetz.github.io/neighbors-prototype/",
+    width: 360, height: 360,
+    colorDark: "#171A2B", colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.M
+  });
+</script>
+</body>
+</html>
