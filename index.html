@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Neighbors — Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+  :root{
+    --purple:#7B2FF5;
+    --purple-dk:#6520d8;
+    --lime:#C9F24E;
+    --lime-deep:#B4E84A;
+    --cream:#F6FAED;
+    --field:#EFF6E0;
+    --ink:#1d1d1f;
+    --ink-soft:#6b6f76;
+    --line:#E5E7DD;
+    --ok:#34b56a;
+    --bg:#ffffff;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;height:100%;}
+  body{
+    font-family:'Fredoka',-apple-system,BlinkMacSystemFont,sans-serif;
+    background:#23252f;display:flex;align-items:center;justify-content:center;
+    min-height:100vh;color:var(--ink);font-weight:400;
+  }
+  .phone{
+    width:390px;max-width:100vw;height:844px;max-height:100vh;background:var(--bg);
+    position:relative;overflow:hidden;border-radius:42px;
+    box-shadow:0 30px 80px rgba(0,0,0,.45);border:10px solid #0c0d12;
+  }
+  @media (max-width:430px){.phone{border-radius:0;border-width:0;height:100vh;}}
+  .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:150px;height:26px;
+    background:#0c0d12;border-radius:0 0 16px 16px;z-index:50;}
+  .screen{position:absolute;inset:0;display:none;flex-direction:column;overflow-y:auto;
+    -webkit-overflow-scrolling:touch;animation:fade .3s ease;}
+  .screen.active{display:flex;}
+  @keyframes fade{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+
+  .pad{padding:64px 24px 28px;flex:1;display:flex;flex-direction:column;}
+  .wordmark{font-weight:700;font-size:30px;letter-spacing:-1px;text-align:center;color:var(--purple);}
+  .wordmark .dot{color:var(--lime-deep);}
+  .tagline{text-align:center;color:#3a3a3a;font-size:15px;margin-top:2px;font-weight:400;}
+  .back{position:absolute;top:54px;left:20px;z-index:40;width:38px;height:38px;border-radius:50%;
+    border:1.5px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;
+    font-size:20px;color:var(--purple);text-decoration:none;cursor:pointer;}
+
+  h1{font-size:25px;line-height:1.25;margin:22px 0 8px;font-weight:600;letter-spacing:-.3px;}
+  h2{font-size:19px;margin:0 0 4px;font-weight:600;}
+  p.body{font-size:17px;line-height:1.5;color:#2a2a2a;text-align:center;font-weight:400;}
+  p.sub{color:var(--ink-soft);font-size:14px;line-height:1.5;margin:0 0 18px;font-weight:400;}
+  label{font-size:14px;font-weight:500;color:#3a3a3a;display:block;margin:16px 0 6px;}
+  .field{width:100%;padding:14px 16px;border:1.5px solid var(--line);border-radius:14px;
+    font-size:16px;background:#fff;outline:none;font-family:inherit;color:var(--ink);}
+  .field::placeholder{color:#9aa0a6;}
+  .field:focus{border-color:var(--purple);}
+  .field-green{background:var(--field);border-color:#dde9c4;}
+
+  .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;
+    border:none;border-radius:14px;font-size:18px;font-weight:600;cursor:pointer;background:var(--purple);
+    color:#fff;font-family:inherit;transition:.15s;}
+  .btn:active{transform:scale(.98);background:var(--purple-dk);}
+  .btn.outline{background:#fff;color:var(--purple);border:2px solid var(--purple);}
+  .btn.lime{background:var(--lime);color:var(--ink);}
+  .btn.dark{background:var(--ink);color:#fff;}
+  .btn[disabled]{opacity:.4;pointer-events:none;}
+  .btn.sm{padding:11px 16px;font-size:15px;width:auto;border-radius:12px;}
+  .row2{display:flex;gap:12px;}
+  .row2 .btn{flex:1;}
+  .spacer{flex:1;}
+  .center{text-align:center;}
+  .link{color:var(--purple);font-weight:500;text-decoration:none;cursor:pointer;font-size:15px;}
+  .or{display:flex;align-items:center;gap:12px;color:var(--ink-soft);font-size:14px;margin:18px 0;}
+  .or::before,.or::after{content:"";flex:1;height:1px;background:var(--line);}
+
+  /* card wraps a form block in cream/green */
+  .greencard{background:var(--cream);border:1.5px solid #e4eccf;border-radius:18px;padding:18px;}
+
+  /* phone country select */
+  .phonewrap{display:flex;gap:10px;}
+  .cc{display:flex;align-items:center;gap:6px;padding:14px 14px;border:1.5px solid #dde9c4;border-radius:14px;
+    background:var(--field);font-size:16px;white-space:nowrap;}
+  .phonewrap .field{flex:1;background:var(--field);border-color:#dde9c4;}
+
+  /* OTP */
+  .otp{display:flex;gap:12px;justify-content:center;margin:14px 0;}
+  .otp input{width:54px;height:64px;text-align:center;font-size:26px;font-weight:600;border:none;
+    border-bottom:3px solid var(--line);outline:none;font-family:inherit;background:transparent;}
+  .otp input:focus{border-color:var(--purple);}
+
+  /* selectable verification options */
+  .opt{padding:15px 16px;border:1.5px solid var(--line);border-radius:16px;background:#fff;
+    margin-bottom:12px;cursor:pointer;transition:.15s;}
+  .opt:active{transform:scale(.99);}
+  .opt.green{background:var(--cream);border-color:#dbe7c0;}
+  .opt.sel{border-color:var(--purple);box-shadow:0 0 0 3px rgba(123,47,245,.12);}
+  .opt .t{font-weight:600;font-size:16px;}
+  .opt .d{font-size:13px;color:var(--ink-soft);margin-top:4px;line-height:1.4;font-weight:400;}
+
+  /* upload tiles */
+  .tile{display:flex;align-items:center;justify-content:space-between;padding:20px 18px;border:1.5px solid var(--line);
+    border-radius:16px;background:#fff;margin-bottom:14px;cursor:pointer;font-size:17px;font-weight:500;}
+  .tile:active{background:#faf9f5;}
+  .tile .ic{font-size:20px;}
+
+  /* ===== FEED ===== */
+  .feedhead{background:var(--lime);padding:58px 20px 20px;}
+  .feedhead .ttl{font-size:20px;font-weight:600;display:flex;align-items:center;gap:8px;}
+  .feedhead .sub{font-size:13px;color:#33401a;margin-top:4px;font-weight:400;line-height:1.4;}
+  .feed{padding:16px 16px 96px;background:#fff;flex:1;}
+  .sectit{font-size:15px;font-weight:600;margin:18px 4px 10px;}
+  .sectit:first-child{margin-top:4px;}
+  .card{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:15px;margin-bottom:14px;}
+  .card.cream{background:var(--cream);border-color:#e4eccf;}
+  .crow{display:flex;align-items:center;gap:10px;}
+  .avatar{width:38px;height:38px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;
+    justify-content:center;font-weight:600;color:#fff;font-size:15px;background:var(--purple);}
+  .name{font-weight:600;font-size:15px;}
+  .meta{font-size:12px;color:var(--ink-soft);font-weight:400;}
+  .timechip{background:var(--lime);border-radius:8px;padding:3px 10px;font-size:13px;font-weight:500;display:inline-block;}
+  .ctext{font-size:14.5px;line-height:1.5;color:#2a2a2a;margin:10px 0;font-weight:400;}
+  .react{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink-soft);font-weight:400;}
+  .react button{border:1.5px solid var(--line);background:#fff;border-radius:20px;padding:5px 10px;
+    cursor:pointer;font-size:14px;font-family:inherit;}
+  .respond{display:flex;align-items:center;gap:8px;margin:10px 0;}
+  .stack{display:flex;}
+  .stack .avatar{width:30px;height:30px;font-size:12px;border:2px solid #fff;margin-left:-8px;}
+  .stack .avatar:first-child{margin-left:0;}
+
+  /* bottom nav with center + */
+  .nav{position:absolute;bottom:0;left:0;right:0;height:74px;background:#fff;border-top:1.5px solid var(--line);
+    display:flex;justify-content:space-around;align-items:center;z-index:30;padding-bottom:8px;}
+  .nav a{font-size:23px;opacity:.45;text-decoration:none;cursor:pointer;}
+  .nav a.on{opacity:1;}
+  .nav .plus{width:54px;height:54px;border-radius:50%;background:var(--purple);color:#fff;display:flex;
+    align-items:center;justify-content:center;font-size:30px;opacity:1;margin-top:-22px;
+    box-shadow:0 8px 20px rgba(123,47,245,.4);}
+
+  /* ===== DRAWER (post composer / time picker) ===== */
+  .scrim{position:absolute;inset:0;background:rgba(0,0,0,.35);z-index:60;display:none;}
+  .scrim.show{display:block;animation:fade .2s;}
+  .drawer{position:absolute;left:0;right:0;bottom:0;background:var(--cream);border-radius:26px 26px 0 0;
+    z-index:61;padding:22px;transform:translateY(100%);transition:transform .3s cubic-bezier(.2,.8,.2,1);
+    max-height:88%;overflow-y:auto;}
+  .drawer.show{transform:translateY(0);}
+  .dhead{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #e2e8d2;
+    padding-bottom:14px;margin-bottom:18px;}
+  .dhead .dt{font-size:22px;font-weight:600;display:flex;align-items:center;gap:8px;}
+  .dclose{width:36px;height:36px;border-radius:50%;background:var(--ink);color:#fff;border:none;font-size:18px;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .typegrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px;}
+  .typecard{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:18px 14px;text-align:center;
+    cursor:pointer;font-weight:500;font-size:15px;transition:.15s;}
+  .typecard:active{transform:scale(.98);}
+  .typecard.sel{border-color:var(--purple);background:#f7f2ff;}
+  .typecard .e{font-size:26px;display:block;margin-bottom:6px;}
+  .selectfield{display:flex;align-items:center;justify-content:space-between;width:100%;padding:14px 16px;
+    border:1.5px solid #cdbff0;border-radius:14px;background:#fff;font-size:16px;cursor:pointer;font-family:inherit;color:var(--ink);}
+  textarea.field{min-height:90px;resize:none;font-family:inherit;}
+
+  /* time picker */
+  .tpwrap{background:#fff;border-radius:16px;padding:18px;text-align:center;}
+  .tpcols{display:flex;justify-content:center;gap:10px;font-size:22px;color:#bdbdbd;align-items:center;}
+  .tpcol{display:flex;flex-direction:column;gap:8px;}
+  .tpcol .v{padding:4px 10px;border-radius:8px;font-weight:400;}
+  .tpcol .v.on{background:var(--lime);color:var(--ink);font-weight:600;}
+  .tpsep{font-weight:600;color:var(--ink);}
+
+  /* scanner */
+  .scanwrap{background:#000;flex:1;position:relative;display:flex;flex-direction:column;}
+  #reader{width:100%;flex:1;}
+  #reader video{object-fit:cover;}
+  .scanhead{position:absolute;top:0;left:0;right:0;z-index:10;padding:52px 20px 16px;
+    background:linear-gradient(#000c,transparent);color:#fff;display:flex;align-items:center;gap:14px;}
+  .scanhead .x{font-size:22px;color:#fff;text-decoration:none;cursor:pointer;}
+  .scanhead .lbl{font-weight:500;}
+  .scanfoot{position:absolute;bottom:0;left:0;right:0;z-index:10;padding:22px;
+    background:linear-gradient(transparent,#000d);color:#fff;text-align:center;}
+  .scanfoot p{font-size:14px;opacity:.85;margin:0 0 14px;font-weight:400;}
+  .reticle{position:absolute;top:46%;left:50%;transform:translate(-50%,-50%);width:230px;height:150px;
+    border:3px solid var(--lime);border-radius:18px;z-index:5;box-shadow:0 0 0 2000px rgba(0,0,0,.4);}
+  .scanline{position:absolute;left:0;right:0;height:3px;background:var(--lime);box-shadow:0 0 12px var(--lime);
+    animation:scan 2.2s ease-in-out infinite;}
+  @keyframes scan{0%{top:6px}50%{top:140px}100%{top:6px}}
+
+  /* success */
+  .successwrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;}
+  .check{width:100px;height:100px;border-radius:50%;background:var(--lime);color:var(--ink);font-size:52px;
+    display:flex;align-items:center;justify-content:center;margin-bottom:22px;animation:pop .4s ease;}
+  @keyframes pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+  .codechip{font-family:monospace;background:var(--cream);border:1.5px solid #e4eccf;border-radius:10px;
+    padding:9px 14px;font-size:15px;margin-top:12px;display:inline-block;}
+
+  .toast{position:absolute;bottom:96px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;
+    padding:11px 18px;border-radius:30px;font-size:14px;z-index:80;opacity:0;transition:.3s;
+    white-space:nowrap;max-width:90%;font-weight:400;}
+  .toast.show{opacity:1;}
+  .toast-ok{background:var(--cream);color:var(--ink);border:1.5px solid #dbe7c0;}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="notch"></div>
+  <div id="toast" class="toast"></div>
+
+  <!-- 1 · 1st screen -->
+  <section class="screen active" id="welcome">
+    <div class="pad">
+      <div style="margin-top:6px;">
+        <div class="wordmark">neighbors<span class="dot">.</span></div>
+        <div class="tagline">The digital knock on your neighbor's door</div>
+      </div>
+      <div class="spacer"></div>
+      <p class="body">Discover who your neighbors are, connect with them, request and offer favors, get notified of relevant updates and more.</p>
+      <div class="spacer"></div>
+      <button class="btn" onclick="go('signup')">Join your neighbors</button>
+      <button class="btn outline" style="margin-top:12px;" onclick="toast('Learn more')">Learn more</button>
+      <p class="center" style="margin-top:18px;"><a class="link" onclick="go('signup')">I'm already a member</a></p>
+    </div>
+  </section>
+
+  <!-- 2 · Signup (email) -->
+  <section class="screen" id="signup">
+    <a class="back" onclick="go('welcome')">‹</a>
+    <div class="pad">
+      <div style="margin-top:6px;">
+        <div class="wordmark">neighbors<span class="dot">.</span></div>
+        <div class="tagline">The digital knock on your neighbor's door</div>
+      </div>
+      <div style="height:30px;"></div>
+      <div class="greencard" id="signupCard">
+        <!-- email mode -->
+        <div id="emailMode">
+          <label style="margin-top:0;">E-mail</label>
+          <input class="field field-green" type="email" placeholder="Email address" oninput="vmail()" />
+        </div>
+        <!-- phone mode -->
+        <div id="phoneMode" style="display:none;">
+          <label style="margin-top:0;">Phone number</label>
+          <div class="phonewrap">
+            <div class="cc">🇪🇸 +34 ▾</div>
+            <input class="field" type="tel" inputmode="numeric" placeholder="610 814 845" oninput="vmail()" />
+          </div>
+        </div>
+        <button class="btn" id="codeBtn" style="margin-top:16px;" onclick="go('confirm')">Receive code</button>
+        <div class="or">Or</div>
+        <p class="center" style="margin:0;"><a class="link" id="switchMode" onclick="toggleMode()">Join with phone number</a></p>
+      </div>
+      <div class="spacer"></div>
+    </div>
+  </section>
+
+  <!-- 3 · Confirmation code -->
+  <section class="screen" id="confirm">
+    <a class="back" onclick="go('signup')">‹</a>
+    <div class="pad">
+      <div style="margin-top:6px;">
+        <div class="wordmark">neighbors<span class="dot">.</span></div>
+        <div class="tagline">The digital knock on your neighbor's door</div>
+      </div>
+      <div style="height:36px;"></div>
+      <div class="otp" id="otpRow">
+        <input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric">
+        <input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric">
+      </div>
+      <p class="center sub">Insert the pin code you received in your E-mail.<br>(For this demo, enter any 4 digits.)</p>
+      <p class="center"><span class="meta">Didn't you receive it? </span><a class="link" onclick="toast('Code resent')">Resend</a></p>
+      <div class="spacer"></div>
+      <button class="btn" id="verifyBtn" disabled onclick="go('details')">Verify</button>
+    </div>
+  </section>
+
+  <!-- 4 · Personal details -->
+  <section class="screen" id="details">
+    <a class="back" onclick="go('confirm')">‹</a>
+    <div class="pad">
+      <div style="margin-top:6px;">
+        <div class="wordmark">neighbors<span class="dot">.</span></div>
+        <div class="tagline">The digital knock on your neighbor's door</div>
+      </div>
+      <div style="height:18px;"></div>
+      <label>Full name</label>
+      <input class="field field-green" value="Julie Dedos" />
+      <label>Address</label>
+      <input class="field field-green" value="Carrer de Sant Vicenç 10, Barcelona" />
+      <div class="row2">
+        <div style="flex:1;"><label>Floor</label><input class="field field-green" value="3" /></div>
+        <div style="flex:1;"><label>Apartment</label><input class="field field-green" value="4" /></div>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn" onclick="go('verify')">Continue</button>
+    </div>
+  </section>
+
+  <!-- 5 · Verification method -->
+  <section class="screen" id="verify">
+    <a class="back" onclick="go('details')">‹</a>
+    <div class="pad">
+      <div style="margin-top:6px;">
+        <div class="wordmark">neighbors<span class="dot">.</span></div>
+        <div class="tagline">The digital knock on your neighbor's door</div>
+      </div>
+      <h1>Address verification method:</h1>
+      <div class="opt sel" data-go="utility" onclick="pickMethod(this)">
+        <div class="t">Utility bill / Contract</div>
+      </div>
+      <div class="opt green" data-go="physical" onclick="pickMethod(this)">
+        <div class="t">Physical letter</div>
+        <div class="d">Receive a physical letter with a pin code to your address. Verification letter takes 3–5 business days.</div>
+      </div>
+      <div class="opt green" data-go="physical" onclick="pickMethod(this)">
+        <div class="t">Ask the admin for an invitation</div>
+        <div class="d">You know the admin of your building's community? Ask them to invite you to it.</div>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn" id="proceedBtn" onclick="proceed()">Proceed</button>
+      <p class="center" style="margin-top:14px;"><a class="link" onclick="go('verified')">Verify address later</a></p>
+    </div>
+  </section>
+
+  <!-- 6a · Utility bill -->
+  <section class="screen" id="utility">
+    <a class="back" onclick="go('verify')">‹</a>
+    <div class="pad">
+      <div style="margin-top:6px;">
+        <div class="wordmark">neighbors<span class="dot">.</span></div>
+        <div class="tagline">The digital knock on your neighbor's door</div>
+      </div>
+      <h1 style="margin-bottom:2px;">Verification by<br>utility bill / contract</h1>
+      <p class="sub">Choose your preferred way to provide us with the document.</p>
+      <div class="tile" onclick="toast('Camera — choose a barcode/QR demo file')"><span>Take a photo</span><span class="ic">📷</span></div>
+      <div class="tile" onclick="toast('Document picker')"><span>Upload document</span><span class="ic">⬆️</span></div>
+      <div class="spacer"></div>
+      <button class="btn" onclick="go('verified')">Confirm</button>
+    </div>
+  </section>
+
+  <!-- 6b · Physical letter -->
+  <section class="screen" id="physical">
+    <a class="back" onclick="go('verify')">‹</a>
+    <div class="pad">
+      <div style="margin-top:6px;">
+        <div class="wordmark">neighbors<span class="dot">.</span></div>
+        <div class="tagline">The digital knock on your neighbor's door</div>
+      </div>
+      <h1>Confirm your address details</h1>
+      <p class="sub">Verification letter takes 3–5 business days.</p>
+      <label>Invitation code</label>
+      <input class="field field-green" placeholder="000 - 111 - 222" />
+      <div class="spacer"></div>
+      <button class="btn" onclick="go('verified')">Confirm</button>
+    </div>
+  </section>
+
+  <!-- 7 · Verified -->
+  <section class="screen" id="verified">
+    <div class="successwrap">
+      <div class="check">✓</div>
+      <h1 style="margin:0;">You're verified!</h1>
+      <p class="sub" style="margin-top:10px;max-width:280px;">Welcome to Carrer de Sant Vicenç. You can now help and be helped by your neighbors.</p>
+      <button class="btn lime" style="max-width:260px;" onclick="go('feed')">Enter the community</button>
+    </div>
+  </section>
+
+  <!-- 8 · Announcements feed -->
+  <section class="screen" id="feed">
+    <div class="feedhead">
+      <div class="ttl">📢 By the admin</div>
+      <div class="sub">Announcements shown below are posted by the admin of your building community.</div>
+    </div>
+    <div class="feed">
+      <div class="card cream">
+        <div class="crow"><b style="font-size:15px;">💧 Water shutoff</b><span class="timechip" style="margin-left:auto;">Tue 09:30–13:00</span></div>
+        <div class="meta" style="margin-top:6px;">Posted today at 13:26</div>
+        <div class="ctext">Tuesday 13.05 there will be a water shutoff from 09:00 until 12:00.</div>
+        <div class="react">Was this useful? <button onclick="toast('Thanks for the feedback')">👍</button><button onclick="toast('Thanks for the feedback')">👎</button></div>
+      </div>
+
+      <div class="sectit">By your neighbors</div>
+      <div class="card">
+        <div class="crow">
+          <div class="avatar" style="background:#E0794A;">R</div>
+          <div><div class="name">Rami B.</div><div class="meta">🔨 Borrow an item · yesterday 18:39</div></div>
+        </div>
+        <div class="ctext">Hey everyone! Anyone has a ladder and can lend it to me tomorrow for 2 hours please? Thank you!</div>
+        <div class="row2">
+          <button class="btn outline sm" style="flex:1;" onclick="toast('Archived')">Archive</button>
+          <button class="btn sm" style="flex:1;" onclick="toast('Reply sent to Rami')">Reply privately</button>
+        </div>
+      </div>
+
+      <div class="sectit">Your requests' status</div>
+      <div class="card" id="myRequestCard" style="display:none;">
+        <div class="crow">
+          <b style="font-size:15px;">📦 Receive my package</b>
+          <a class="link" style="margin-left:auto;font-size:14px;" onclick="openCompose()">Edit</a>
+        </div>
+        <div class="meta" id="myReqWhen" style="margin-top:6px;">Posted just now</div>
+        <div class="respond">
+          <div class="stack">
+            <div class="avatar" style="background:#5A4FE3;">Y</div>
+            <div class="avatar" style="background:#34b56a;">M</div>
+            <div class="avatar" style="background:#E0794A;">A</div>
+          </div>
+          <span class="meta">3 neighbors responded</span>
+        </div>
+        <button class="btn" onclick="go('connect')">Connect</button>
+      </div>
+      <div class="card cream" id="emptyReqCard">
+        <div class="ctext" style="margin-top:0;font-weight:500;">Going away? Ask a verified neighbor to receive a package for you.</div>
+        <button class="btn dark" onclick="openCompose()">+ Request package help</button>
+      </div>
+    </div>
+
+    <div class="nav">
+      <a class="on" onclick="go('feed')">🏠</a>
+      <a onclick="toast('Map — coming soon')">🗺️</a>
+      <a class="plus" onclick="openCompose()">+</a>
+      <a onclick="toast('Messages — coming soon')">💬</a>
+      <a onclick="toast('Profile — coming soon')">👤</a>
+    </div>
+  </section>
+
+  <!-- 9 · Connect (a neighbor accepted) -->
+  <section class="screen" id="connect">
+    <a class="back" onclick="go('feed')">‹</a>
+    <div class="pad">
+      <h1 style="margin-top:8px;">Neighbors who can help</h1>
+      <p class="sub">Pick a neighbor to receive your package. They'll confirm by scanning it on arrival.</p>
+
+      <div class="card" style="border-color:var(--purple);box-shadow:0 0 0 3px rgba(123,47,245,.1);">
+        <div class="crow">
+          <div class="avatar" style="background:#5A4FE3;">Y</div>
+          <div><div class="name">Yara M. ✓</div><div class="meta">2nd floor · 4.9★ · 12 helps</div></div>
+        </div>
+        <div class="ctext">"Heey Julie, I work from home Thursday — happy to receive it and hold it for you!"</div>
+        <button class="btn" onclick="go('handoff')">Choose Yara</button>
+      </div>
+
+      <div class="card">
+        <div class="crow">
+          <div class="avatar" style="background:#34b56a;">M</div>
+          <div><div class="name">Marc T. ✓</div><div class="meta">Ground floor · 4.8★ · 5 helps</div></div>
+        </div>
+        <div class="ctext">"I'm around all afternoon, can grab it from the courier."</div>
+        <button class="btn outline" onclick="go('handoff')">Choose Marc</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 · Handoff / scan intro (the helper's view) -->
+  <section class="screen" id="handoff">
+    <a class="back" onclick="go('connect')">‹</a>
+    <div class="pad">
+      <div class="card cream" style="margin-top:10px;">
+        <div class="crow"><div class="avatar" style="background:#5A4FE3;">Y</div>
+          <div><div class="name">Yara M.</div><div class="meta">will receive your package</div></div></div>
+        <div class="ctext" style="margin-bottom:0;">📦 <b>Package arriving Thursday, Jun 18</b><br>Yara confirms receipt by scanning the barcode on the label.</div>
+      </div>
+      <h1>Confirm the package</h1>
+      <p class="sub">When the courier hands it over, scan the barcode on the package label to log that it's safely received.</p>
+      <div style="background:#fff;border:1.5px dashed var(--line);border-radius:18px;padding:28px;text-align:center;">
+        <div style="font-size:50px;">📦</div>
+        <div class="meta" style="margin-top:8px;">Any product barcode or QR code works for this demo</div>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn" onclick="startScan()">📷 Scan package barcode</button>
+      <p class="center" style="margin-top:14px;"><a class="link" onclick="manualEntry()">Enter the code manually instead</a></p>
+    </div>
+  </section>
+
+  <!-- 11 · Scanner -->
+  <section class="screen" id="scan">
+    <div class="scanwrap">
+      <div class="scanhead"><a class="x" onclick="stopScan('handoff')">✕</a><span class="lbl">Scan package barcode</span></div>
+      <div id="reader"></div>
+      <div class="reticle"><div class="scanline"></div></div>
+      <div class="scanfoot">
+        <p>Hold steady — line the barcode up inside the box</p>
+        <a class="link" style="color:#fff;" onclick="manualEntry()">Can't scan? Enter code manually</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 · Received -->
+  <section class="screen" id="received">
+    <div class="successwrap">
+      <div class="check">✓</div>
+      <h1 style="margin:0;">Package received!</h1>
+      <p class="sub" style="margin-top:10px;max-width:290px;">Logged and confirmed. <b>Julie</b> has been notified that her package is safe with Yara.</p>
+      <div class="codechip" id="scannedCode">—</div>
+      <button class="btn" style="max-width:260px;margin-top:24px;" onclick="toast('Julie: “You’re a lifesaver! 🙌”')">Message Julie</button>
+      <button class="btn outline" style="max-width:260px;" onclick="go('feed')">Done</button>
+    </div>
+  </section>
+
+  <!-- ===== DRAWER: post composer ===== -->
+  <div class="scrim" id="scrim" onclick="closeDrawer()"></div>
+  <div class="drawer" id="composeDrawer">
+    <div class="dhead"><div class="dt">📦 Receive my package</div><button class="dclose" onclick="closeDrawer()">✕</button></div>
+    <label style="margin-top:0;">What's arriving?</label>
+    <input class="field" placeholder="e.g. Small box from Amazon" id="pkgWhat" />
+    <label>When?</label>
+    <button class="selectfield" onclick="openTimePicker()"><span id="whenVal">Thursday, 11:30</span><span>▾</span></button>
+    <label>A note for your neighbor</label>
+    <textarea class="field" placeholder="Leave it with the concierge if I'm out 🙏"></textarea>
+    <div style="height:18px;"></div>
+    <div class="row2">
+      <button class="btn outline" onclick="closeDrawer()">Back</button>
+      <button class="btn" onclick="postRequest()">Done</button>
+    </div>
+  </div>
+
+  <!-- ===== DRAWER: time picker ===== -->
+  <div class="scrim" id="scrim2" onclick="closeTimePicker()"></div>
+  <div class="drawer" id="timeDrawer">
+    <div class="dhead"><div class="dt">⏰ Set time</div><button class="dclose" onclick="closeTimePicker()">✕</button></div>
+    <div class="tpwrap">
+      <div class="tpcols">
+        <div class="tpcol"><span class="v">09</span><span class="v">10</span><span class="v on" id="hr">11</span><span class="v">12</span><span class="v">01</span></div>
+        <span class="tpsep">:</span>
+        <div class="tpcol"><span class="v">20</span><span class="v">25</span><span class="v on" id="mn">30</span><span class="v">35</span><span class="v">40</span></div>
+      </div>
+    </div>
+    <div style="height:16px;"></div>
+    <div class="row2">
+      <button class="btn outline" onclick="closeTimePicker()">Cancel</button>
+      <button class="btn" onclick="confirmTime()">Confirm</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let html5qr=null, mode='email';
+
+  function go(id){
+    if(id!=='scan') stopScanSilent();
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    const el=document.getElementById(id); el.classList.add('active'); el.scrollTop=0;
+  }
+  let toastT;
+  function toast(msg,ok){
+    const t=document.getElementById('toast');
+    t.textContent=msg; t.className='toast show'+(ok?' toast-ok':'');
+    clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2400);
+  }
+
+  /* signup mode toggle */
+  function toggleMode(){
+    mode = mode==='email' ? 'phone':'email';
+    document.getElementById('emailMode').style.display = mode==='email'?'block':'none';
+    document.getElementById('phoneMode').style.display = mode==='phone'?'block':'none';
+    document.getElementById('switchMode').textContent = mode==='email'?'Join with phone number':'Join with e-mail';
+    vmail();
+  }
+  function vmail(){ /* keep button always enabled for demo flow */ }
+
+  /* OTP */
+  const otp=[...document.querySelectorAll('#otpRow input')];
+  otp.forEach((inp,i)=>{
+    inp.addEventListener('input',()=>{
+      inp.value=inp.value.replace(/\D/g,'');
+      if(inp.value&&i<3)otp[i+1].focus();
+      document.getElementById('verifyBtn').disabled = otp.some(x=>!x.value);
+    });
+    inp.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!inp.value&&i>0)otp[i-1].focus();});
+  });
+
+  /* verification method */
+  let chosenMethod='utility';
+  function pickMethod(el){
+    document.querySelectorAll('#verify .opt').forEach(o=>o.classList.remove('sel'));
+    el.classList.add('sel'); chosenMethod=el.dataset.go;
+  }
+  function proceed(){ go(chosenMethod); }
+
+  /* compose drawer */
+  function openCompose(){
+    document.getElementById('scrim').classList.add('show');
+    document.getElementById('composeDrawer').classList.add('show');
+  }
+  function closeDrawer(){
+    document.getElementById('scrim').classList.remove('show');
+    document.getElementById('composeDrawer').classList.remove('show');
+  }
+  function postRequest(){
+    closeDrawer();
+    document.getElementById('myRequestCard').style.display='block';
+    document.getElementById('emptyReqCard').style.display='none';
+    document.getElementById('myReqWhen').textContent='Arriving '+document.getElementById('whenVal').textContent;
+    toast('Request was sent successfully',true);
+  }
+
+  /* time picker */
+  function openTimePicker(){
+    document.getElementById('scrim2').classList.add('show');
+    document.getElementById('timeDrawer').classList.add('show');
+  }
+  function closeTimePicker(){
+    document.getElementById('scrim2').classList.remove('show');
+    document.getElementById('timeDrawer').classList.remove('show');
+  }
+  document.querySelectorAll('#timeDrawer .tpcol').forEach(col=>{
+    col.querySelectorAll('.v').forEach(v=>v.addEventListener('click',()=>{
+      col.querySelectorAll('.v').forEach(x=>x.classList.remove('on')); v.classList.add('on');
+    }));
+  });
+  function confirmTime(){
+    const h=document.getElementById('timeDrawer').querySelectorAll('.tpcol')[0].querySelector('.on').textContent;
+    const m=document.getElementById('timeDrawer').querySelectorAll('.tpcol')[1].querySelector('.on').textContent;
+    document.getElementById('whenVal').textContent='Thursday, '+h+':'+m;
+    closeTimePicker();
+  }
+
+  /* ---- scanner ---- */
+  function startScan(){
+    go('scan');
+    if(typeof Html5Qrcode==='undefined'){ toast('Scanner not loaded — use manual entry'); return; }
+    setTimeout(()=>{
+      html5qr=new Html5Qrcode("reader",{verbose:false});
+      html5qr.start({facingMode:"environment"},{fps:12,qrbox:{width:240,height:160}},
+        (txt)=>{ stopScan(null); showReceived(txt); }, ()=>{}
+      ).catch(()=>toast('Camera unavailable — use manual entry'));
+    },250);
+  }
+  function stopScan(returnTo){ stopScanSilent(); if(returnTo) go(returnTo); }
+  function stopScanSilent(){ if(html5qr){ try{html5qr.stop().then(()=>{try{html5qr.clear();}catch(e){}});}catch(e){} html5qr=null; } }
+  function manualEntry(){
+    const code=prompt("Enter the package barcode number:","ES"+Math.floor(100000000+Math.random()*900000000));
+    if(code){ stopScanSilent(); showReceived(code.trim()); }
+  }
+  function showReceived(code){ document.getElementById('scannedCode').textContent='📦 '+code; go('received'); }
+</script>
+</body>
+</html>
