@@ -202,6 +202,29 @@
     white-space:nowrap;max-width:90%;font-weight:400;}
   .toast.show{opacity:1;}
   .toast-ok{background:var(--cream);color:var(--ink);border:1.5px solid #dbe7c0;}
+
+  /* ===== CHAT ===== */
+  #chat.screen{overflow:hidden;}
+  .chathead{display:flex;align-items:center;gap:10px;padding:50px 16px 12px;border-bottom:1.5px solid var(--line);
+    flex-shrink:0;background:#fff;}
+  .chathead .back-inline{font-size:26px;line-height:1;color:var(--purple);text-decoration:none;cursor:pointer;}
+  .chatctx{flex-shrink:0;background:var(--cream);border-bottom:1px solid #e4eccf;padding:9px 16px;font-size:13px;
+    color:#3c4416;font-weight:500;text-align:center;}
+  .msgs{flex:1;overflow-y:auto;min-height:0;padding:16px;display:flex;flex-direction:column;gap:9px;background:#faf9f7;}
+  .bubble{max-width:80%;padding:11px 14px;border-radius:18px;font-size:15px;line-height:1.4;font-weight:400;}
+  .bubble.in{align-self:flex-start;background:#fff;border:1.5px solid var(--line);border-bottom-left-radius:5px;}
+  .bubble.out{align-self:flex-end;background:var(--purple);color:#fff;border-bottom-right-radius:5px;}
+  .bubble .t{display:block;font-size:10.5px;opacity:.55;margin-top:4px;}
+  .bubble.sys{align-self:center;background:#EAF6CE;color:#3c4416;font-size:13px;text-align:center;max-width:90%;
+    border-radius:12px;font-weight:500;}
+  .inputbar{flex-shrink:0;display:flex;align-items:center;gap:8px;padding:10px 12px 16px;border-top:1.5px solid var(--line);background:#fff;}
+  .inputbar .iconbtn{width:42px;height:42px;border-radius:50%;border:1.5px solid var(--line);background:#fff;
+    font-size:18px;cursor:pointer;flex-shrink:0;}
+  .inputbar .msgin{flex:1;padding:12px 16px;border:1.5px solid var(--line);border-radius:22px;font-size:15px;
+    outline:none;font-family:inherit;color:var(--ink);}
+  .inputbar .msgin:focus{border-color:var(--purple);}
+  .inputbar .sendbtn{width:42px;height:42px;border-radius:50%;border:none;background:var(--purple);color:#fff;
+    font-size:17px;cursor:pointer;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -432,7 +455,7 @@
     <a class="back" onclick="go('feed')">‹</a>
     <div class="pad">
       <h1 style="margin-top:8px;">Neighbors who can help</h1>
-      <p class="sub">Pick a neighbor to receive your package. They'll confirm by scanning it on arrival.</p>
+      <p class="sub">Tap a neighbor to start a chat and sort out the details of the handoff.</p>
 
       <div class="card" style="border-color:var(--purple);box-shadow:0 0 0 3px rgba(123,47,245,.1);">
         <div class="crow">
@@ -440,7 +463,7 @@
           <div><div class="name">Yara M. ✓</div><div class="meta">2nd floor · 4.9★ · 12 helps</div></div>
         </div>
         <div class="ctext">"Heey Julie, I work from home Thursday — happy to receive it and hold it for you!"</div>
-        <button class="btn" onclick="go('handoff')">Choose Yara</button>
+        <button class="btn" onclick="openChat('Yara M.','#5A4FE3','Y')">💬 Chat with Yara</button>
       </div>
 
       <div class="card">
@@ -449,54 +472,37 @@
           <div><div class="name">Marc T. ✓</div><div class="meta">Ground floor · 4.8★ · 5 helps</div></div>
         </div>
         <div class="ctext">"I'm around all afternoon, can grab it from the courier."</div>
-        <button class="btn outline" onclick="go('handoff')">Choose Marc</button>
+        <button class="btn outline" onclick="openChat('Marc T.','#34b56a','M')">💬 Chat with Marc</button>
       </div>
     </div>
   </section>
 
-  <!-- 10 · Handoff / scan intro (the helper's view) -->
-  <section class="screen" id="handoff">
-    <a class="back" onclick="go('connect')">‹</a>
-    <div class="pad">
-      <div class="card cream" style="margin-top:10px;">
-        <div class="crow"><div class="avatar" style="background:#5A4FE3;">Y</div>
-          <div><div class="name">Yara M.</div><div class="meta">will receive your package</div></div></div>
-        <div class="ctext" style="margin-bottom:0;">📦 <b>Package arriving Thursday, Jun 18</b><br>Yara confirms receipt by scanning the barcode on the label.</div>
-      </div>
-      <h1>Confirm the package</h1>
-      <p class="sub">When the courier hands it over, scan the barcode on the package label to log that it's safely received.</p>
-      <div style="background:#fff;border:1.5px dashed var(--line);border-radius:18px;padding:28px;text-align:center;">
-        <div style="font-size:50px;">📦</div>
-        <div class="meta" style="margin-top:8px;">Any product barcode or QR code works for this demo</div>
-      </div>
-      <div class="spacer"></div>
-      <button class="btn" onclick="startScan()">📷 Scan package barcode</button>
-      <p class="center" style="margin-top:14px;"><a class="link" onclick="manualEntry()">Enter the code manually instead</a></p>
+  <!-- 10 · Chat with neighbor -->
+  <section class="screen" id="chat">
+    <div class="chathead">
+      <a class="back-inline" onclick="go('connect')">‹</a>
+      <div class="avatar" id="chatAvatar" style="background:#5A4FE3;">Y</div>
+      <div><div class="name" id="chatName">Yara M.</div><div class="meta" style="color:#2bb673;">● Online · verified neighbor</div></div>
+    </div>
+    <div class="chatctx">📦 Receive my package · arriving Thursday, Jun 18</div>
+    <div class="msgs" id="msgs"></div>
+    <div class="inputbar">
+      <button class="iconbtn" onclick="startScan()" title="Scan package">📷</button>
+      <input class="msgin" id="msgin" placeholder="Message Yara…" onkeydown="if(event.key==='Enter')sendMsg()" />
+      <button class="sendbtn" onclick="sendMsg()">➤</button>
     </div>
   </section>
 
   <!-- 11 · Scanner -->
   <section class="screen" id="scan">
     <div class="scanwrap">
-      <div class="scanhead"><a class="x" onclick="stopScan('handoff')">✕</a><span class="lbl">Scan package barcode</span></div>
+      <div class="scanhead"><a class="x" onclick="stopScan('chat')">✕</a><span class="lbl">Scan package barcode</span></div>
       <div id="reader"></div>
       <div class="reticle"><div class="scanline"></div></div>
       <div class="scanfoot">
         <p>Hold steady — line the barcode up inside the box</p>
         <a class="link" style="color:#fff;" onclick="manualEntry()">Can't scan? Enter code manually</a>
       </div>
-    </div>
-  </section>
-
-  <!-- 12 · Received -->
-  <section class="screen" id="received">
-    <div class="successwrap">
-      <div class="check">✓</div>
-      <h1 style="margin:0;">Package received!</h1>
-      <p class="sub" style="margin-top:10px;max-width:290px;">Logged and confirmed. <b>Julie</b> has been notified that her package is safe with Yara.</p>
-      <div class="codechip" id="scannedCode">—</div>
-      <button class="btn" style="max-width:260px;margin-top:24px;" onclick="toast('Julie: “You’re a lifesaver! 🙌”')">Message Julie</button>
-      <button class="btn outline" style="max-width:260px;" onclick="go('feed')">Done</button>
     </div>
   </section>
 
@@ -539,6 +545,7 @@
 
 <script>
   let html5qr=null, mode='email';
+  let chatPeer={name:'Yara M.',color:'#5A4FE3',initial:'Y'};
 
   function go(id){
     if(id!=='scan') stopScanSilent();
@@ -636,7 +643,38 @@
     const code=prompt("Enter the package barcode number:","ES"+Math.floor(100000000+Math.random()*900000000));
     if(code){ stopScanSilent(); showReceived(code.trim()); }
   }
-  function showReceived(code){ document.getElementById('scannedCode').textContent='📦 '+code; go('received'); }
+  function showReceived(code){
+    go('chat');
+    appendMsg('sys','📦 Package scanned & logged — barcode '+code);
+    setTimeout(()=>appendMsg('in','Got it — your package is safe with me 🎉 I\'ll hold it until you\'re back.', nowTime()),700);
+    toast('Package confirmed — '+chatPeer.name.split(' ')[0]+' notified', true);
+  }
+
+  /* ---- chat ---- */
+  function nowTime(){ const d=new Date(); return d.getHours()+':'+String(d.getMinutes()).padStart(2,'0'); }
+  function openChat(name,color,initial){
+    chatPeer={name,color,initial};
+    document.getElementById('chatName').textContent=name;
+    const av=document.getElementById('chatAvatar'); av.textContent=initial; av.style.background=color;
+    document.getElementById('msgin').placeholder='Message '+name.split(' ')[0]+'…';
+    const m=document.getElementById('msgs'); m.innerHTML='';
+    appendMsg('in','Heey Julie! Happy to receive your package on Thursday 😊','9:32');
+    appendMsg('in','Just send me the courier details and I\'ll keep an eye out.','9:32');
+    go('chat');
+    m.scrollTop=m.scrollHeight;
+  }
+  function appendMsg(kind,text,time){
+    const m=document.getElementById('msgs');
+    const b=document.createElement('div'); b.className='bubble '+kind;
+    b.innerHTML = (kind==='sys') ? text : text + (time?'<span class="t">'+time+'</span>':'');
+    m.appendChild(b); m.scrollTop=m.scrollHeight;
+  }
+  const replies=['Got it, thanks! 🙌','Perfect, I\'ll be home 😊','No problem at all!','Sounds good — I\'ll message you when it arrives.','👍'];
+  function sendMsg(){
+    const inp=document.getElementById('msgin'); const v=inp.value.trim(); if(!v) return;
+    appendMsg('out',v,nowTime()); inp.value='';
+    setTimeout(()=>appendMsg('in',replies[Math.floor(Math.random()*replies.length)],nowTime()),900);
+  }
 </script>
 </body>
 </html>
