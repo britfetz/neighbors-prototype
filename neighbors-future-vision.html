@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Neighbors — Future Vision</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --purple:#7B2FF5;--purple-dk:#6520d8;--lime:#C9F24E;--lime-deep:#B4E84A;
+    --cream:#F6FAED;--field:#EFF6E0;--ink:#1d1d1f;--ink-soft:#6b6f76;--line:#E5E7DD;
+    --star:#F5A623;--map-bg:#E7EDE3;--park:#C7E6A6;--road:#FBFBF8;--water:#CDE3EC;
+  }
+  *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent;}
+  body{font-family:'Fredoka',-apple-system,BlinkMacSystemFont,sans-serif;color:var(--ink);
+    background:#eceae6;padding:40px 20px 60px;}
+  .showhead{text-align:center;max-width:780px;margin:0 auto 8px;}
+  .showhead .kicker{display:inline-block;background:var(--purple);color:#fff;font-size:13px;font-weight:600;
+    padding:6px 14px;border-radius:20px;letter-spacing:.3px;}
+  .showhead h1{font-size:34px;font-weight:700;letter-spacing:-.5px;margin:16px 0 6px;}
+  .showhead p{font-size:17px;color:var(--ink-soft);font-weight:400;line-height:1.5;}
+  .stage{display:flex;gap:48px;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin-top:40px;}
+  .col{display:flex;flex-direction:column;align-items:center;gap:18px;}
+  .caption{max-width:300px;text-align:center;}
+  .caption .t{font-weight:600;font-size:18px;}
+  .caption .d{font-size:14px;color:var(--ink-soft);font-weight:400;line-height:1.45;margin-top:4px;}
+
+  /* phone */
+  .phone{width:300px;height:620px;background:#fff;position:relative;overflow:hidden;
+    border-radius:38px;border:9px solid #0c0d12;box-shadow:0 24px 60px rgba(0,0,0,.28);}
+  .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:22px;
+    background:#0c0d12;border-radius:0 0 14px 14px;z-index:50;}
+  .screen{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;}
+
+  .feedhead{background:var(--lime);padding:42px 16px 14px;flex-shrink:0;}
+  .feedhead .ttl{font-size:18px;font-weight:600;display:flex;align-items:center;gap:7px;}
+  .feedhead .sub{font-size:12px;color:#33401a;margin-top:3px;font-weight:400;line-height:1.35;}
+  .wordmark{font-weight:700;font-size:15px;color:var(--purple);letter-spacing:-.3px;}
+  .wordmark .dot{color:var(--lime-deep);}
+
+  .name{font-weight:600;font-size:14px;}
+  .meta{font-size:11px;color:var(--ink-soft);font-weight:400;}
+  .avatar{width:38px;height:38px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;
+    justify-content:center;font-weight:600;color:#fff;font-size:14px;}
+  .stars{color:var(--star);font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:3px;white-space:nowrap;}
+  .stars .num{color:var(--ink);} .stars .rev{color:var(--ink-soft);font-weight:400;}
+
+  /* bottom nav */
+  .nav{height:60px;background:#fff;border-top:1.5px solid var(--line);display:flex;justify-content:space-around;
+    align-items:center;flex-shrink:0;padding-bottom:6px;}
+  .nav a{font-size:19px;opacity:.45;text-decoration:none;}
+  .nav a.on{opacity:1;}
+  .nav .plus{width:46px;height:46px;border-radius:50%;background:var(--purple);color:#fff;display:flex;
+    align-items:center;justify-content:center;font-size:26px;opacity:1;margin-top:-18px;
+    box-shadow:0 6px 16px rgba(123,47,245,.4);}
+
+  /* ===== MAP screen ===== */
+  .mapwrap{flex:1;position:relative;overflow:hidden;background:var(--map-bg);}
+  .mapwrap svg{position:absolute;inset:0;width:100%;height:100%;}
+  .pin{position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;z-index:3;}
+  .pin .dot{width:34px;height:34px;border-radius:50% 50% 50% 4px;transform:rotate(45deg);
+    display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(0,0,0,.25);border:2px solid #fff;}
+  .pin .dot span{transform:rotate(-45deg);font-size:16px;}
+  .pin.p-purple .dot{background:var(--purple);}
+  .pin.p-lime .dot{background:var(--lime-deep);}
+  .pin.p-orange .dot{background:#E0794A;}
+  .pin.p-blue .dot{background:#5A4FE3;}
+  .here{position:absolute;width:18px;height:18px;border-radius:50%;background:#2b8cff;border:3px solid #fff;
+    transform:translate(-50%,-50%);z-index:2;box-shadow:0 0 0 6px rgba(43,140,255,.25);}
+  .callout{position:absolute;z-index:5;background:#fff;border-radius:12px;padding:8px 10px;width:140px;
+    box-shadow:0 8px 22px rgba(0,0,0,.18);transform:translate(-50%,-118%);}
+  .callout .ct{font-weight:600;font-size:12.5px;}
+  .callout .cm{font-size:10.5px;color:var(--ink-soft);margin-top:1px;}
+  .callout .cm b{color:var(--purple);}
+  .callout:after{content:"";position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);
+    border:7px solid transparent;border-top-color:#fff;border-bottom:0;}
+  .maptop{position:absolute;top:10px;left:10px;right:10px;z-index:6;display:flex;gap:6px;}
+  .searchbar{flex:1;background:#fff;border-radius:20px;padding:8px 12px;font-size:12px;color:var(--ink-soft);
+    box-shadow:0 4px 12px rgba(0,0,0,.12);display:flex;align-items:center;gap:6px;}
+  .chip{background:#fff;border-radius:16px;padding:7px 11px;font-size:11px;font-weight:500;
+    box-shadow:0 4px 12px rgba(0,0,0,.12);white-space:nowrap;}
+  .chip.on{background:var(--purple);color:#fff;}
+  /* bottom sheet peek */
+  .sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:18px 18px 0 0;z-index:7;
+    padding:8px 14px 14px;box-shadow:0 -8px 24px rgba(0,0,0,.12);}
+  .grab{width:38px;height:4px;border-radius:4px;background:#dadbd4;margin:2px auto 10px;}
+  .sheet .sh{font-size:13px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;}
+  .sheet .sh .seeall{margin-left:auto;color:var(--purple);font-size:11px;font-weight:600;}
+  .evrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line);}
+  .evrow:first-of-type{border-top:0;}
+  .evico{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+    font-size:18px;flex-shrink:0;background:var(--cream);}
+  .evrow .et{font-weight:600;font-size:13px;}
+  .evrow .em{font-size:11px;color:var(--ink-soft);margin-top:1px;}
+  .evrow .ed{margin-left:auto;text-align:right;font-size:11px;color:var(--purple);font-weight:600;white-space:nowrap;}
+
+  /* ===== PROS screen ===== */
+  .chips{display:flex;gap:7px;padding:12px 14px 4px;overflow-x:auto;flex-shrink:0;}
+  .chips::-webkit-scrollbar{display:none;}
+  .fchip{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:7px 12px;font-size:12px;
+    font-weight:500;white-space:nowrap;}
+  .fchip.on{background:var(--purple);color:#fff;border-color:var(--purple);}
+  .prolist{flex:1;overflow-y:auto;padding:10px 14px 16px;background:#faf9f7;}
+  .procard{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:13px;margin-bottom:11px;}
+  .procard .top{display:flex;gap:11px;align-items:flex-start;}
+  .procard .role{font-size:11.5px;color:var(--purple);font-weight:600;margin-top:1px;}
+  .verif{font-size:10px;color:#2bb673;font-weight:600;}
+  .procard .desc{font-size:12.5px;color:#42454f;font-weight:400;line-height:1.4;margin:9px 0 11px;}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:11px;}
+  .tag{background:var(--field);border:1px solid #dde9c4;border-radius:14px;padding:3px 9px;font-size:10.5px;font-weight:500;color:#3c4416;}
+  .procard .acts{display:flex;gap:8px;}
+  .btn{flex:1;text-align:center;padding:9px;border-radius:11px;font-size:13px;font-weight:600;font-family:inherit;border:none;cursor:pointer;}
+  .btn.solid{background:var(--purple);color:#fff;} .btn.out{background:#fff;color:var(--purple);border:1.5px solid var(--purple);}
+  .price{margin-left:auto;font-size:12px;font-weight:600;color:var(--ink);}
+</style>
+</head>
+<body>
+  <div class="showhead">
+    <span class="kicker">FUTURE VISION</span>
+    <h1>Where Neighbors could grow next</h1>
+    <p>Two concept screens, built in the Neighbors design system — extending the trusted-neighbor network from favors into local life and local livelihoods.</p>
+  </div>
+
+  <div class="stage">
+
+    <!-- ===== PHONE 1: EVENTS MAP ===== -->
+    <div class="col">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="feedhead">
+            <div class="wordmark">neighbors<span class="dot">.</span></div>
+            <div class="ttl" style="margin-top:4px;">🗺️ Happening nearby</div>
+            <div class="sub">Hyper-local events your verified neighbors are hosting this week.</div>
+          </div>
+
+          <div class="mapwrap">
+            <svg viewBox="0 0 300 380" preserveAspectRatio="xMidYMid slice">
+              <rect width="300" height="380" fill="#E7EDE3"/>
+              <!-- park -->
+              <rect x="22" y="40" width="104" height="92" rx="14" fill="#C7E6A6"/>
+              <rect x="170" y="210" width="118" height="120" rx="14" fill="#C7E6A6"/>
+              <!-- water -->
+              <path d="M0,300 Q90,270 150,310 T300,300 L300,380 L0,380 Z" fill="#CDE3EC"/>
+              <!-- roads -->
+              <g stroke="#FBFBF8" stroke-width="13" stroke-linecap="round">
+                <line x1="-10" y1="150" x2="310" y2="170"/>
+                <line x1="150" y1="-10" x2="135" y2="300"/>
+                <line x1="-10" y1="245" x2="180" y2="235"/>
+                <line x1="60" y1="-10" x2="70" y2="390"/>
+                <line x1="220" y1="-10" x2="235" y2="220"/>
+              </g>
+              <g stroke="#EFF1EC" stroke-width="5">
+                <line x1="0" y1="95" x2="300" y2="105"/>
+                <line x1="255" y1="0" x2="262" y2="380"/>
+              </g>
+            </svg>
+
+            <div class="maptop">
+              <div class="searchbar">🔍 Search events nearby</div>
+              <div class="chip on">This week</div>
+            </div>
+
+            <!-- you are here -->
+            <div class="here" style="left:48%;top:42%;"></div>
+
+            <!-- pins -->
+            <div class="callout" style="left:30%;top:24%;">
+              <div class="ct">🎉 Rooftop swap meet</div>
+              <div class="cm">Today 18:00 · <b>120 m</b> · 14 going</div>
+            </div>
+            <div class="pin p-purple" style="left:30%;top:30%;"><div class="dot"><span>🎉</span></div></div>
+            <div class="pin p-lime" style="left:62%;top:22%;"><div class="dot"><span>🎶</span></div></div>
+            <div class="pin p-orange" style="left:74%;top:60%;"><div class="dot"><span>🧺</span></div></div>
+            <div class="pin p-blue" style="left:24%;top:60%;"><div class="dot"><span>🔧</span></div></div>
+            <div class="pin p-lime" style="left:50%;top:72%;"><div class="dot"><span>🧘</span></div></div>
+
+            <!-- bottom sheet peek -->
+            <div class="sheet">
+              <div class="grab"></div>
+              <div class="sh">Events near you <span class="seeall">See all 12 →</span></div>
+              <div class="evrow">
+                <div class="evico">🎉</div>
+                <div><div class="et">Rooftop swap meet</div><div class="em">Carrer Verdi 18 · hosted by Sara M.</div></div>
+                <div class="ed">120 m<br>Today 18:00</div>
+              </div>
+              <div class="evrow">
+                <div class="evico">🧘</div>
+                <div><div class="et">Sunset yoga in the plaça</div><div class="em">Plaça del Sol · hosted by Marc T.</div></div>
+                <div class="ed">300 m<br>Sat 19:30</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="nav">
+            <a>🏠</a><a class="on">🗺️</a><a class="plus">+</a><a>💬</a><a>👤</a>
+          </div>
+        </div>
+      </div>
+      <div class="caption">
+        <div class="t">Hyper-local events map</div>
+        <div class="d">Discover what's happening on your street — swaps, picnics, classes — all hosted by verified neighbors, pinned by distance.</div>
+      </div>
+    </div>
+
+    <!-- ===== PHONE 2: LOCAL PROS ===== -->
+    <div class="col">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="feedhead">
+            <div class="wordmark">neighbors<span class="dot">.</span></div>
+            <div class="ttl" style="margin-top:4px;">🛠️ Local pros</div>
+            <div class="sub">Trusted professionals on your street, rated by the people next door.</div>
+          </div>
+
+          <div class="chips">
+            <div class="fchip on">All</div>
+            <div class="fchip">Plumber</div>
+            <div class="fchip">Electrician</div>
+            <div class="fchip">Tutor</div>
+            <div class="fchip">Cleaning</div>
+            <div class="fchip">Pet care</div>
+          </div>
+
+          <div class="prolist">
+            <div class="procard">
+              <div class="top">
+                <div class="avatar" style="background:#5A4FE3;">EL</div>
+                <div style="flex:1;">
+                  <div class="name">Elena Ríos <span class="verif">✓ Verified</span></div>
+                  <div class="role">Plumber · 80 m away</div>
+                </div>
+                <div class="stars">★ <span class="num">4.9</span> <span class="rev">(37)</span></div>
+              </div>
+              <div class="desc">Leaks, boilers & bathroom fittings. Same-day for neighbors in the building.</div>
+              <div class="tags"><span class="tag">Emergency</span><span class="tag">Boilers</span><span class="tag">Speaks EN/ES</span></div>
+              <div class="acts">
+                <button class="btn out">Message</button>
+                <button class="btn solid">Book</button>
+                <span class="price">from €30</span>
+              </div>
+            </div>
+
+            <div class="procard">
+              <div class="top">
+                <div class="avatar" style="background:#E0794A;">DK</div>
+                <div style="flex:1;">
+                  <div class="name">David Koch <span class="verif">✓ Verified</span></div>
+                  <div class="role">Electrician · 150 m away</div>
+                </div>
+                <div class="stars">★ <span class="num">4.8</span> <span class="rev">(52)</span></div>
+              </div>
+              <div class="desc">Wiring, lighting & smart-home setup. Free quote for first-time neighbors.</div>
+              <div class="tags"><span class="tag">Smart home</span><span class="tag">Certified</span></div>
+              <div class="acts">
+                <button class="btn out">Message</button>
+                <button class="btn solid">Book</button>
+                <span class="price">from €40</span>
+              </div>
+            </div>
+
+            <div class="procard">
+              <div class="top">
+                <div class="avatar" style="background:#2bb673;">NA</div>
+                <div style="flex:1;">
+                  <div class="name">Nadia Amrani <span class="verif">✓ Verified</span></div>
+                  <div class="role">Maths & science tutor · 60 m away</div>
+                </div>
+                <div class="stars">★ <span class="num">5.0</span> <span class="rev">(21)</span></div>
+              </div>
+              <div class="desc">ESO & Batxillerat tutoring. Group rates for kids in the building.</div>
+              <div class="tags"><span class="tag">Ages 10–18</span><span class="tag">Home visits</span></div>
+              <div class="acts">
+                <button class="btn out">Message</button>
+                <button class="btn solid">Book</button>
+                <span class="price">€18/hr</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="nav">
+            <a>🏠</a><a>🗺️</a><a class="plus">+</a><a>💬</a><a class="on">🛠️</a>
+          </div>
+        </div>
+      </div>
+      <div class="caption">
+        <div class="t">Local professionals &amp; services</div>
+        <div class="d">A trusted marketplace of nearby pros — each rated and reviewed by real neighbors, so you hire with confidence.</div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
