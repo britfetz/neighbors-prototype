@@ -21,6 +21,8 @@
     --line:#E5E7DD;
     --ok:#34b56a;
     --bg:#ffffff;
+    --star:#F5A623;
+    --map-bg:#E7EDE3;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;height:100%;}
@@ -141,6 +143,66 @@
   .nav .plus{width:54px;height:54px;border-radius:50%;background:var(--purple);color:#fff;display:flex;
     align-items:center;justify-content:center;font-size:30px;line-height:1;opacity:1;margin-top:-20px;
     box-shadow:0 8px 20px rgba(123,47,245,.4);}
+
+  /* ===== MAP (events) screen ===== */
+  #map.screen,#pros.screen{overflow:hidden;}
+  .mapwrap{flex:1;position:relative;overflow:hidden;background:var(--map-bg);min-height:0;}
+  .mapwrap svg{position:absolute;inset:0;width:100%;height:100%;}
+  .pin{position:absolute;transform:translate(-50%,-100%);z-index:3;}
+  .pin .dot{width:38px;height:38px;border-radius:50% 50% 50% 4px;transform:rotate(45deg);display:flex;
+    align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(0,0,0,.25);border:2px solid #fff;}
+  .pin .dot span{transform:rotate(-45deg);font-size:18px;}
+  .pin.p-purple .dot{background:var(--purple);}
+  .pin.p-lime .dot{background:var(--lime-deep);}
+  .pin.p-orange .dot{background:#E0794A;}
+  .pin.p-blue .dot{background:#5A4FE3;}
+  .here{position:absolute;width:18px;height:18px;border-radius:50%;background:#2b8cff;border:3px solid #fff;
+    transform:translate(-50%,-50%);z-index:2;box-shadow:0 0 0 6px rgba(43,140,255,.25);}
+  .callout{position:absolute;z-index:5;background:#fff;border-radius:12px;padding:9px 11px;width:165px;
+    box-shadow:0 8px 22px rgba(0,0,0,.18);transform:translate(-50%,-118%);}
+  .callout .ct{font-weight:600;font-size:13.5px;}
+  .callout .cm{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+  .callout .cm b{color:var(--purple);}
+  .callout:after{content:"";position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);
+    border:7px solid transparent;border-top-color:#fff;border-bottom:0;}
+  .maptop{position:absolute;top:12px;left:12px;right:12px;z-index:6;display:flex;gap:8px;}
+  .searchbar{flex:1;background:#fff;border-radius:22px;padding:11px 14px;font-size:14px;color:var(--ink-soft);
+    box-shadow:0 4px 12px rgba(0,0,0,.12);}
+  .mapchip{background:var(--purple);color:#fff;border-radius:18px;padding:10px 14px;font-size:13px;font-weight:600;
+    box-shadow:0 4px 12px rgba(0,0,0,.12);white-space:nowrap;}
+  .sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:18px 18px 0 0;z-index:7;
+    padding:8px 16px 16px;box-shadow:0 -8px 24px rgba(0,0,0,.12);}
+  .grab{width:40px;height:4px;border-radius:4px;background:#dadbd4;margin:4px auto 12px;}
+  .sheet .sh{font-size:15px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;}
+  .sheet .sh .seeall{margin-left:auto;color:var(--purple);font-size:13px;font-weight:600;cursor:pointer;}
+  .evrow{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line);}
+  .evrow:first-of-type{border-top:0;}
+  .evico{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    font-size:20px;flex-shrink:0;background:var(--cream);}
+  .evrow .et{font-weight:600;font-size:14.5px;}
+  .evrow .em{font-size:12px;color:var(--ink-soft);margin-top:1px;}
+  .evrow .ed{margin-left:auto;text-align:right;font-size:12px;color:var(--purple);font-weight:600;white-space:nowrap;}
+
+  /* ===== LOCAL PROS screen ===== */
+  .chips{display:flex;gap:8px;padding:14px 16px 6px;overflow-x:auto;flex-shrink:0;}
+  .chips::-webkit-scrollbar{display:none;}
+  .fchip{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:8px 14px;font-size:13px;
+    font-weight:500;white-space:nowrap;cursor:pointer;}
+  .fchip.on{background:var(--purple);color:#fff;border-color:var(--purple);}
+  .prolist{flex:1;overflow-y:auto;min-height:0;padding:12px 16px 16px;background:#faf9f7;}
+  .procard{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:15px;margin-bottom:13px;}
+  .procard .ptop{display:flex;gap:12px;align-items:flex-start;}
+  .procard .role{font-size:12.5px;color:var(--purple);font-weight:600;margin-top:1px;}
+  .verif{font-size:11px;color:#2bb673;font-weight:600;}
+  .procard .desc{font-size:14px;color:#42454f;font-weight:400;line-height:1.45;margin:10px 0 12px;}
+  .tags{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px;}
+  .tag{background:var(--field);border:1px solid #dde9c4;border-radius:14px;padding:4px 10px;font-size:11.5px;
+    font-weight:500;color:#3c4416;}
+  .procard .pacts{display:flex;gap:9px;align-items:center;}
+  .procard .pacts .btn{flex:1;padding:10px;font-size:14px;}
+  .price{margin-left:auto;font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;}
+  .stars{color:var(--star);font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:3px;white-space:nowrap;}
+  .stars .num{color:var(--ink);} .stars .rev{color:var(--ink-soft);font-weight:400;}
 
   /* ===== DRAWER (post composer / time picker) ===== */
   .scrim{position:absolute;inset:0;background:rgba(0,0,0,.35);z-index:60;display:none;}
@@ -443,9 +505,106 @@
 
     <div class="nav">
       <a class="on" onclick="go('feed')">🏠</a>
-      <a onclick="toast('Map — coming soon')">🗺️</a>
+      <a onclick="go('map')">🗺️</a>
       <a class="plus" onclick="openCompose()">+</a>
-      <a onclick="toast('Local pros — coming soon')">🛠️</a>
+      <a onclick="go('pros')">🛠️</a>
+      <a onclick="toast('Profile — coming soon')">👤</a>
+    </div>
+  </section>
+
+  <!-- 8b · Events map -->
+  <section class="screen" id="map">
+    <div class="feedhead">
+      <div class="ttl">🗺️ Happening nearby</div>
+      <div class="sub">Hyper-local events your verified neighbors are hosting this week.</div>
+    </div>
+    <div class="mapwrap">
+      <svg viewBox="0 0 300 380" preserveAspectRatio="xMidYMid slice">
+        <rect width="300" height="380" fill="#E7EDE3"/>
+        <rect x="22" y="40" width="104" height="92" rx="14" fill="#C7E6A6"/>
+        <rect x="170" y="210" width="118" height="120" rx="14" fill="#C7E6A6"/>
+        <path d="M0,300 Q90,270 150,310 T300,300 L300,380 L0,380 Z" fill="#CDE3EC"/>
+        <g stroke="#FBFBF8" stroke-width="13" stroke-linecap="round">
+          <line x1="-10" y1="150" x2="310" y2="170"/><line x1="150" y1="-10" x2="135" y2="300"/>
+          <line x1="-10" y1="245" x2="180" y2="235"/><line x1="60" y1="-10" x2="70" y2="390"/>
+          <line x1="220" y1="-10" x2="235" y2="220"/>
+        </g>
+        <g stroke="#EFF1EC" stroke-width="5"><line x1="0" y1="95" x2="300" y2="105"/><line x1="255" y1="0" x2="262" y2="380"/></g>
+      </svg>
+      <div class="maptop"><div class="searchbar">🔍 Search events nearby</div><div class="mapchip">This week</div></div>
+      <div class="here" style="left:46%;top:46%;"></div>
+      <div class="callout" style="left:33%;top:36%;">
+        <div class="ct">🍷 Wine on the Roof</div>
+        <div class="cm">Today 18:00 · <b>120 m</b> · 14 going</div>
+      </div>
+      <div class="pin p-purple" style="left:33%;top:42%;"><div class="dot"><span>🍷</span></div></div>
+      <div class="pin p-lime" style="left:67%;top:26%;"><div class="dot"><span>🎶</span></div></div>
+      <div class="pin p-orange" style="left:77%;top:48%;"><div class="dot"><span>🧺</span></div></div>
+      <div class="pin p-blue" style="left:23%;top:54%;"><div class="dot"><span>🔧</span></div></div>
+      <div class="pin p-lime" style="left:55%;top:54%;"><div class="dot"><span>🧘</span></div></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <div class="sh">Events near you <span class="seeall" onclick="toast('Full events list — coming soon')">See all 12 →</span></div>
+        <div class="evrow"><div class="evico">🍷</div><div><div class="et">Wine on the Roof</div><div class="em">Carrer Verdi 18 · hosted by Sara M.</div></div><div class="ed">120 m<br>Today 18:00</div></div>
+        <div class="evrow"><div class="evico">🧘</div><div><div class="et">Sunset yoga in the plaça</div><div class="em">Plaça del Sol · hosted by Marc T.</div></div><div class="ed">300 m<br>Sat 19:30</div></div>
+      </div>
+    </div>
+    <div class="nav">
+      <a onclick="go('feed')">🏠</a>
+      <a class="on" onclick="go('map')">🗺️</a>
+      <a class="plus" onclick="openCompose()">+</a>
+      <a onclick="go('pros')">🛠️</a>
+      <a onclick="toast('Profile — coming soon')">👤</a>
+    </div>
+  </section>
+
+  <!-- 8c · Local pros -->
+  <section class="screen" id="pros">
+    <div class="feedhead">
+      <div class="ttl">🛠️ Local pros</div>
+      <div class="sub">Trusted professionals on your street, rated by the people next door.</div>
+    </div>
+    <div class="chips">
+      <div class="fchip on">All</div><div class="fchip">Plumber</div><div class="fchip">Electrician</div>
+      <div class="fchip">Tutor</div><div class="fchip">Cleaning</div><div class="fchip">Pet care</div>
+    </div>
+    <div class="prolist">
+      <div class="procard">
+        <div class="ptop">
+          <div class="avatar" style="background:#5A4FE3;">EL</div>
+          <div style="flex:1;"><div class="name">Elena Ríos <span class="verif">✓ Verified</span></div><div class="role">Plumber · 80 m away</div></div>
+          <div class="stars">★ <span class="num">4.9</span> <span class="rev">(37)</span></div>
+        </div>
+        <div class="desc">Leaks, boilers & bathroom fittings. Same-day for neighbors in the building.</div>
+        <div class="tags"><span class="tag">Emergency</span><span class="tag">Boilers</span><span class="tag">Speaks EN/ES</span></div>
+        <div class="pacts"><button class="btn outline" onclick="toast('Message sent to Elena')">Message</button><button class="btn" onclick="toast('Booking request sent')">Book</button><span class="price">from €30</span></div>
+      </div>
+      <div class="procard">
+        <div class="ptop">
+          <div class="avatar" style="background:#E0794A;">DK</div>
+          <div style="flex:1;"><div class="name">David Koch <span class="verif">✓ Verified</span></div><div class="role">Electrician · 150 m away</div></div>
+          <div class="stars">★ <span class="num">4.8</span> <span class="rev">(52)</span></div>
+        </div>
+        <div class="desc">Wiring, lighting & smart-home setup. Free quote for first-time neighbors.</div>
+        <div class="tags"><span class="tag">Smart home</span><span class="tag">Certified</span></div>
+        <div class="pacts"><button class="btn outline" onclick="toast('Message sent to David')">Message</button><button class="btn" onclick="toast('Booking request sent')">Book</button><span class="price">from €40</span></div>
+      </div>
+      <div class="procard">
+        <div class="ptop">
+          <div class="avatar" style="background:#2bb673;">NA</div>
+          <div style="flex:1;"><div class="name">Nadia Amrani <span class="verif">✓ Verified</span></div><div class="role">Maths & science tutor · 60 m away</div></div>
+          <div class="stars">★ <span class="num">5.0</span> <span class="rev">(21)</span></div>
+        </div>
+        <div class="desc">ESO & Batxillerat tutoring. Group rates for kids in the building.</div>
+        <div class="tags"><span class="tag">Ages 10–18</span><span class="tag">Home visits</span></div>
+        <div class="pacts"><button class="btn outline" onclick="toast('Message sent to Nadia')">Message</button><button class="btn" onclick="toast('Booking request sent')">Book</button><span class="price">€18/hr</span></div>
+      </div>
+    </div>
+    <div class="nav">
+      <a onclick="go('feed')">🏠</a>
+      <a onclick="go('map')">🗺️</a>
+      <a class="plus" onclick="openCompose()">+</a>
+      <a class="on" onclick="go('pros')">🛠️</a>
       <a onclick="toast('Profile — coming soon')">👤</a>
     </div>
   </section>
