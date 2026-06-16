@@ -145,7 +145,7 @@
     box-shadow:0 8px 20px rgba(123,47,245,.4);}
 
   /* ===== MAP (events) screen ===== */
-  #map.screen,#pros.screen{overflow:hidden;}
+  #map.screen,#pros.screen,#profile.screen,#proDetail.screen{overflow:hidden;}
   .mapwrap{flex:1;position:relative;overflow:hidden;background:var(--map-bg);min-height:0;}
   .mapwrap svg{position:absolute;inset:0;width:100%;height:100%;}
   .pin{position:absolute;transform:translate(-50%,-100%);z-index:3;}
@@ -203,6 +203,31 @@
   .price{margin-left:auto;font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;}
   .stars{color:var(--star);font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:3px;white-space:nowrap;}
   .stars .num{color:var(--ink);} .stars .rev{color:var(--ink-soft);font-weight:400;}
+
+  /* ===== Detail + Profile screens ===== */
+  .evhero{background:var(--lime);padding:60px 24px 22px;text-align:center;}
+  .evhero-emoji{font-size:48px;line-height:1;}
+  .evhero h1{font-size:24px;}
+  .dl{display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:14.5px;}
+  .dl span{color:var(--ink-soft);}
+  .dl + .dl{border-top:1px solid #e4eccf;}
+  .prohead{padding:56px 24px 18px;text-align:center;display:flex;flex-direction:column;align-items:center;
+    border-bottom:1.5px solid var(--line);}
+  .sectit2{font-weight:600;font-size:15px;margin:18px 2px 10px;}
+  .review{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px;}
+  .review .rh{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+  .review .rt{font-size:13.5px;color:#42454f;line-height:1.45;}
+  .actionbar{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:12px 16px 18px;
+    border-top:1.5px solid var(--line);background:#fff;}
+  .actionbar .btn{font-size:15px;padding:13px;}
+  .switch{width:44px;height:26px;border-radius:14px;background:#cfd2c8;position:relative;cursor:pointer;
+    flex-shrink:0;transition:.2s;}
+  .switch:after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;
+    background:#fff;transition:.2s;}
+  .switch.on{background:var(--purple);}
+  .switch.on:after{left:21px;}
+  .setrow{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1.5px solid var(--line);
+    border-radius:14px;padding:14px 16px;margin-bottom:10px;font-size:15px;font-weight:500;cursor:pointer;}
 
   /* ===== DRAWER (post composer / time picker) ===== */
   .scrim{position:absolute;inset:0;background:rgba(0,0,0,.35);z-index:60;display:none;}
@@ -508,7 +533,7 @@
       <a onclick="go('map')">🗺️</a>
       <a class="plus" onclick="openCompose()">+</a>
       <a onclick="go('pros')">🛠️</a>
-      <a onclick="toast('Profile — coming soon')">👤</a>
+      <a onclick="go('profile')">👤</a>
     </div>
   </section>
 
@@ -533,20 +558,20 @@
       </svg>
       <div class="maptop"><div class="searchbar">🔍 Search events nearby</div><div class="mapchip">This week</div></div>
       <div class="here" style="left:46%;top:46%;"></div>
-      <div class="callout" style="left:33%;top:36%;">
+      <div class="callout" style="left:33%;top:36%;cursor:pointer;" onclick="openEvent('🍷','Wine on the Roof','Sara M.','Today, 18:00','120 m away','14','Rooftop wine tasting with the neighbors — bring a bottle to share or just come hang out. Sunset views over the barri included. 🌇')">
         <div class="ct">🍷 Wine on the Roof</div>
         <div class="cm">Today 18:00 · <b>120 m</b> · 14 going</div>
       </div>
-      <div class="pin p-purple" style="left:33%;top:42%;"><div class="dot"><span>🍷</span></div></div>
-      <div class="pin p-lime" style="left:67%;top:26%;"><div class="dot"><span>🎶</span></div></div>
-      <div class="pin p-orange" style="left:77%;top:48%;"><div class="dot"><span>🧺</span></div></div>
-      <div class="pin p-blue" style="left:23%;top:54%;"><div class="dot"><span>🔧</span></div></div>
-      <div class="pin p-lime" style="left:55%;top:54%;"><div class="dot"><span>🧘</span></div></div>
+      <div class="pin p-purple" style="left:33%;top:42%;" onclick="openEvent('🍷','Wine on the Roof','Sara M.','Today, 18:00','120 m away','14','Rooftop wine tasting with the neighbors — bring a bottle to share or just come hang out. Sunset views over the barri included. 🌇')"><div class="dot"><span>🍷</span></div></div>
+      <div class="pin p-lime" style="left:67%;top:26%;" onclick="openEvent('🎶','Live music night','Jordi P.','Fri, 21:00','250 m away','32','Acoustic sets from neighbors on the corner plaça. Bring a chair and a friend. 🎸')"><div class="dot"><span>🎶</span></div></div>
+      <div class="pin p-orange" style="left:77%;top:48%;" onclick="openEvent('🧺','Community picnic','Lucía R.','Sun, 13:00','400 m away','28','Potluck picnic in the park — bring something to share. Kids and dogs welcome! 🐶')"><div class="dot"><span>🧺</span></div></div>
+      <div class="pin p-blue" style="left:23%;top:54%;" onclick="openEvent('🔧','Tool-share Saturday','Building admin','Sat, 10:00','50 m away','11','Borrow or lend tools in the lobby — drills, ladders, the lot. Label yours so they find their way home.')"><div class="dot"><span>🔧</span></div></div>
+      <div class="pin p-lime" style="left:55%;top:54%;" onclick="openEvent('🧘','Sunset yoga in the plaça','Marc T.','Sat, 19:30','300 m away','9','Gentle flow in Plaça del Sol as the sun sets. All levels welcome — a few spare mats available.')"><div class="dot"><span>🧘</span></div></div>
       <div class="sheet">
         <div class="grab"></div>
         <div class="sh">Events near you <span class="seeall" onclick="toast('Full events list — coming soon')">See all 12 →</span></div>
-        <div class="evrow"><div class="evico">🍷</div><div><div class="et">Wine on the Roof</div><div class="em">Carrer Verdi 18 · hosted by Sara M.</div></div><div class="ed">120 m<br>Today 18:00</div></div>
-        <div class="evrow"><div class="evico">🧘</div><div><div class="et">Sunset yoga in the plaça</div><div class="em">Plaça del Sol · hosted by Marc T.</div></div><div class="ed">300 m<br>Sat 19:30</div></div>
+        <div class="evrow" style="cursor:pointer;" onclick="openEvent('🍷','Wine on the Roof','Sara M.','Today, 18:00','120 m away','14','Rooftop wine tasting with the neighbors — bring a bottle to share or just come hang out. Sunset views over the barri included. 🌇')"><div class="evico">🍷</div><div><div class="et">Wine on the Roof</div><div class="em">Carrer Verdi 18 · hosted by Sara M.</div></div><div class="ed">120 m<br>Today 18:00</div></div>
+        <div class="evrow" style="cursor:pointer;" onclick="openEvent('🧘','Sunset yoga in the plaça','Marc T.','Sat, 19:30','300 m away','9','Gentle flow in Plaça del Sol as the sun sets. All levels welcome — a few spare mats available.')"><div class="evico">🧘</div><div><div class="et">Sunset yoga in the plaça</div><div class="em">Plaça del Sol · hosted by Marc T.</div></div><div class="ed">300 m<br>Sat 19:30</div></div>
       </div>
     </div>
     <div class="nav">
@@ -554,7 +579,7 @@
       <a class="on" onclick="go('map')">🗺️</a>
       <a class="plus" onclick="openCompose()">+</a>
       <a onclick="go('pros')">🛠️</a>
-      <a onclick="toast('Profile — coming soon')">👤</a>
+      <a onclick="go('profile')">👤</a>
     </div>
   </section>
 
@@ -569,7 +594,7 @@
       <div class="fchip">Tutor</div><div class="fchip">Cleaning</div><div class="fchip">Pet care</div>
     </div>
     <div class="prolist">
-      <div class="procard">
+      <div class="procard" style="cursor:pointer;" onclick="openPro('EL','#5A4FE3','Elena Ríos','Plumber · 80 m away','4.9','37','Leaks, boilers & bathroom fittings. Same-day for neighbors in the building. 15 years working across the Gràcia barri.','Emergency,Boilers,Speaks EN/ES','from €30')">
         <div class="ptop">
           <div class="avatar" style="background:#5A4FE3;">EL</div>
           <div style="flex:1;"><div class="name">Elena Ríos <span class="verif">✓ Verified</span></div><div class="role">Plumber · 80 m away</div></div>
@@ -577,9 +602,9 @@
         </div>
         <div class="desc">Leaks, boilers & bathroom fittings. Same-day for neighbors in the building.</div>
         <div class="tags"><span class="tag">Emergency</span><span class="tag">Boilers</span><span class="tag">Speaks EN/ES</span></div>
-        <div class="pacts"><button class="btn outline" onclick="toast('Message sent to Elena')">Message</button><button class="btn" onclick="toast('Booking request sent')">Book</button><span class="price">from €30</span></div>
+        <div class="pacts"><button class="btn outline" onclick="event.stopPropagation();toast('Message sent to Elena')">Message</button><button class="btn" onclick="event.stopPropagation();toast('Booking request sent')">Book</button><span class="price">from €30</span></div>
       </div>
-      <div class="procard">
+      <div class="procard" style="cursor:pointer;" onclick="openPro('DK','#E0794A','David Koch','Electrician · 150 m away','4.8','52','Wiring, lighting & smart-home setup. Free quote for first-time neighbors. Fully certified and insured.','Smart home,Certified','from €40')">
         <div class="ptop">
           <div class="avatar" style="background:#E0794A;">DK</div>
           <div style="flex:1;"><div class="name">David Koch <span class="verif">✓ Verified</span></div><div class="role">Electrician · 150 m away</div></div>
@@ -587,9 +612,9 @@
         </div>
         <div class="desc">Wiring, lighting & smart-home setup. Free quote for first-time neighbors.</div>
         <div class="tags"><span class="tag">Smart home</span><span class="tag">Certified</span></div>
-        <div class="pacts"><button class="btn outline" onclick="toast('Message sent to David')">Message</button><button class="btn" onclick="toast('Booking request sent')">Book</button><span class="price">from €40</span></div>
+        <div class="pacts"><button class="btn outline" onclick="event.stopPropagation();toast('Message sent to David')">Message</button><button class="btn" onclick="event.stopPropagation();toast('Booking request sent')">Book</button><span class="price">from €40</span></div>
       </div>
-      <div class="procard">
+      <div class="procard" style="cursor:pointer;" onclick="openPro('NA','#2bb673','Nadia Amrani','Maths &amp; science tutor · 60 m away','5.0','21','ESO &amp; Batxillerat tutoring. Group rates for kids in the building. Patient and exam-focused.','Ages 10–18,Home visits','€18/hr')">
         <div class="ptop">
           <div class="avatar" style="background:#2bb673;">NA</div>
           <div style="flex:1;"><div class="name">Nadia Amrani <span class="verif">✓ Verified</span></div><div class="role">Maths & science tutor · 60 m away</div></div>
@@ -597,7 +622,7 @@
         </div>
         <div class="desc">ESO & Batxillerat tutoring. Group rates for kids in the building.</div>
         <div class="tags"><span class="tag">Ages 10–18</span><span class="tag">Home visits</span></div>
-        <div class="pacts"><button class="btn outline" onclick="toast('Message sent to Nadia')">Message</button><button class="btn" onclick="toast('Booking request sent')">Book</button><span class="price">€18/hr</span></div>
+        <div class="pacts"><button class="btn outline" onclick="event.stopPropagation();toast('Message sent to Nadia')">Message</button><button class="btn" onclick="event.stopPropagation();toast('Booking request sent')">Book</button><span class="price">€18/hr</span></div>
       </div>
     </div>
     <div class="nav">
@@ -605,7 +630,88 @@
       <a onclick="go('map')">🗺️</a>
       <a class="plus" onclick="openCompose()">+</a>
       <a class="on" onclick="go('pros')">🛠️</a>
-      <a onclick="toast('Profile — coming soon')">👤</a>
+      <a onclick="go('profile')">👤</a>
+    </div>
+  </section>
+
+  <!-- 8d · Event detail -->
+  <section class="screen" id="eventDetail">
+    <a class="back" onclick="go('map')">‹</a>
+    <div class="evhero">
+      <div class="evhero-emoji" id="evD_emoji">🍷</div>
+      <h1 id="evD_title" style="margin:6px 0 0;">Wine on the Roof</h1>
+    </div>
+    <div class="pad" style="padding:18px 24px 28px;">
+      <div class="card cream">
+        <div class="dl"><span>🗓️ When</span><b id="evD_when">Today, 18:00</b></div>
+        <div class="dl"><span>📍 Distance</span><b id="evD_dist">120 m away</b></div>
+        <div class="dl"><span>🙋 Host</span><b id="evD_host">Sara M.</b></div>
+      </div>
+      <p class="ctext" id="evD_desc" style="margin:14px 0;">Rooftop wine tasting with the neighbors.</p>
+      <div class="respond">
+        <div class="stack"><div class="avatar" style="background:#5A4FE3;">Y</div><div class="avatar" style="background:#34b56a;">M</div><div class="avatar" style="background:#E0794A;">R</div></div>
+        <span class="meta" id="evD_going">14 neighbors going</span>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn" onclick="toast('You&#39;re going! 🎉')">I'm going</button>
+      <button class="btn outline" style="margin-top:10px;" onclick="toast('Message sent to host')">Message host</button>
+    </div>
+  </section>
+
+  <!-- 8e · Pro detail -->
+  <section class="screen" id="proDetail">
+    <a class="back" onclick="go('pros')">‹</a>
+    <div class="prohead">
+      <div class="avatar" id="prD_av" style="width:72px;height:72px;font-size:24px;background:#5A4FE3;margin-bottom:8px;">EL</div>
+      <div class="name" id="prD_name" style="font-size:20px;">Elena Ríos <span class="verif">✓ Verified</span></div>
+      <div id="prD_role" style="font-size:13px;color:var(--purple);font-weight:600;">Plumber · 80 m away</div>
+      <div class="stars" id="prD_rating" style="font-size:15px;margin-top:6px;">★ <span class="num">4.9</span> <span class="rev">(37 reviews)</span></div>
+    </div>
+    <div class="pad" style="padding:18px 24px 20px;flex:1;overflow-y:auto;">
+      <p class="ctext" id="prD_desc" style="margin:0 0 12px;">Leaks, boilers & bathroom fittings.</p>
+      <div class="tags" id="prD_tags"></div>
+      <div class="sectit2">Recent reviews</div>
+      <div class="review"><div class="rh"><div class="avatar" style="width:28px;height:28px;font-size:12px;background:#5A4FE3;">J</div><b style="font-size:13px;">Jordi P.</b><span class="stars" style="margin-left:auto;">★ 5.0</span></div><div class="rt">"Came within the hour and fixed our leak. A lifesaver — and lovely with the kids."</div></div>
+      <div class="review"><div class="rh"><div class="avatar" style="width:28px;height:28px;font-size:12px;background:#34b56a;">L</div><b style="font-size:13px;">Lucía R.</b><span class="stars" style="margin-left:auto;">★ 4.8</span></div><div class="rt">"Fair price, tidy work, explained everything. Hiring again for sure."</div></div>
+    </div>
+    <div class="actionbar">
+      <span class="price" id="prD_price">from €30</span>
+      <button class="btn outline" style="flex:1;" onclick="toast('Message sent')">Message</button>
+      <button class="btn" style="flex:1;" onclick="toast('Booking request sent')">Book</button>
+    </div>
+  </section>
+
+  <!-- 8f · Profile -->
+  <section class="screen" id="profile">
+    <div class="feedhead" style="padding-bottom:18px;">
+      <div class="crow" style="gap:14px;">
+        <div class="avatar" style="width:60px;height:60px;font-size:22px;background:#E0794A;">JD</div>
+        <div>
+          <div class="name" style="font-size:19px;">Julie D. <span class="verif">✓ Verified</span></div>
+          <div class="meta" style="color:#33401a;">Carrer de Sant Vicenç 10</div>
+          <div style="margin-top:4px;font-size:13px;color:#33401a;"><b>6</b> posts · <b>3</b> helps · ⭐ 4.9</div>
+        </div>
+      </div>
+    </div>
+    <div class="prolist" style="background:#fff;">
+      <div class="card" style="display:flex;align-items:center;margin-bottom:14px;">
+        <div class="name" style="font-size:14px;">Hide profile from unverified users</div>
+        <span class="switch on" style="margin-left:auto;" onclick="this.classList.toggle('on')"></span>
+      </div>
+      <div class="sectit2" style="margin-top:4px;">Past conversations & requests</div>
+      <div class="card" style="cursor:pointer;" onclick="openChat('Yara M.','#5A4FE3','Y')">
+        <div class="crow"><div class="avatar" style="background:#5A4FE3;">Y</div><div><div class="name">📦 Pickup my package</div><div class="meta">Yara M. · "Heey Julie, I can pick it up"</div></div></div>
+      </div>
+      <div class="sectit2">Items I can lend</div>
+      <div class="tags"><span class="tag">Ladder</span><span class="tag">Iron</span><span class="tag">Hammer</span><span class="tag">Paint brush</span><span class="tag">Printer</span><span class="tag">Pressure cooker</span></div>
+      <div class="sectit2">Settings</div>
+      <div class="setrow" onclick="toast('Archived content — coming soon')"><span>Archived content</span><span>›</span></div>
+      <div class="setrow" onclick="toast('Settings — coming soon')"><span>Account &amp; privacy</span><span>›</span></div>
+      <div class="setrow" onclick="toast('Swaps — coming soon')"><span>Swaps</span><span>›</span></div>
+      <div class="setrow" style="color:#d9534f;" onclick="toast('Signed out (demo)')"><span>Sign out</span></div>
+    </div>
+    <div class="nav">
+      <a onclick="go('feed')">🏠</a><a onclick="go('map')">🗺️</a><a class="plus" onclick="openCompose()">+</a><a onclick="go('pros')">🛠️</a><a class="on" onclick="go('profile')">👤</a>
     </div>
   </section>
 
@@ -833,6 +939,30 @@
     const inp=document.getElementById('msgin'); const v=inp.value.trim(); if(!v) return;
     appendMsg('out',v,nowTime()); inp.value='';
     setTimeout(()=>appendMsg('in',replies[Math.floor(Math.random()*replies.length)],nowTime()),900);
+  }
+
+  /* ---- event detail ---- */
+  function openEvent(emoji,title,host,when,dist,going,desc){
+    document.getElementById('evD_emoji').textContent=emoji;
+    document.getElementById('evD_title').textContent=title;
+    document.getElementById('evD_host').textContent=host;
+    document.getElementById('evD_when').textContent=when;
+    document.getElementById('evD_dist').textContent=dist;
+    document.getElementById('evD_going').textContent=going+' neighbors going';
+    document.getElementById('evD_desc').textContent=desc;
+    go('eventDetail');
+  }
+
+  /* ---- pro detail ---- */
+  function openPro(initials,color,name,role,rating,reviews,desc,tagsCSV,price){
+    var av=document.getElementById('prD_av'); av.textContent=initials; av.style.background=color;
+    document.getElementById('prD_name').innerHTML=name+' <span class="verif">✓ Verified</span>';
+    document.getElementById('prD_role').textContent=role;
+    document.getElementById('prD_rating').innerHTML='★ <span class="num">'+rating+'</span> <span class="rev">('+reviews+' reviews)</span>';
+    document.getElementById('prD_desc').textContent=desc;
+    document.getElementById('prD_tags').innerHTML=tagsCSV.split(',').map(function(t){return '<span class="tag">'+t+'</span>';}).join('');
+    document.getElementById('prD_price').textContent=price;
+    go('proDetail');
   }
 </script>
 </body>
