@@ -112,7 +112,8 @@
   .feedhead{background:var(--lime);padding:58px 20px 20px;}
   .feedhead .ttl{font-size:20px;font-weight:600;display:flex;align-items:center;gap:8px;}
   .feedhead .sub{font-size:13px;color:#33401a;margin-top:4px;font-weight:400;line-height:1.4;}
-  .feed{padding:16px 16px 96px;background:#fff;flex:1;}
+  #feed.screen{overflow:hidden;}
+  .feed{padding:16px 16px 24px;background:#fff;flex:1;overflow-y:auto;min-height:0;}
   .sectit{font-size:15px;font-weight:600;margin:18px 4px 10px;}
   .sectit:first-child{margin-top:4px;}
   .card{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:15px;margin-bottom:14px;}
@@ -133,7 +134,7 @@
   .stack .avatar:first-child{margin-left:0;}
 
   /* bottom nav with center + */
-  .nav{position:absolute;bottom:0;left:0;right:0;height:74px;background:#fff;border-top:1.5px solid var(--line);
+  .nav{flex-shrink:0;height:74px;background:#fff;border-top:1.5px solid var(--line);
     display:flex;justify-content:space-around;align-items:center;z-index:30;padding-bottom:8px;}
   .nav a{font-size:23px;opacity:.45;text-decoration:none;cursor:pointer;}
   .nav a.on{opacity:1;}
