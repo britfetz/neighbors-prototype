@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Neighbors — Future Vision</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root{
     --purple:#7B2FF5;--purple-dk:#6520d8;--lime:#C9F24E;--lime-deep:#B4E84A;
@@ -24,6 +25,9 @@
   .caption{max-width:300px;text-align:center;}
   .caption .t{font-weight:600;font-size:18px;}
   .caption .d{font-size:14px;color:var(--ink-soft);font-weight:400;line-height:1.45;margin-top:4px;}
+  .dlbtn{margin-top:14px;background:var(--purple);color:#fff;border:none;border-radius:12px;
+    padding:11px 20px;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;}
+  .dlbtn:hover{background:var(--purple-dk);}
 
   /* phone */
   .phone{width:300px;height:620px;background:#fff;position:relative;overflow:hidden;
@@ -201,6 +205,7 @@
         <div class="t">Hyper-local events map</div>
         <div class="d">Discover what's happening on your street — swaps, picnics, classes — all hosted by verified neighbors, pinned by distance.</div>
       </div>
+      <button class="dlbtn" onclick="dl(this,'neighbors-events-map.png')">⬇ Download PNG</button>
     </div>
 
     <!-- ===== PHONE 2: LOCAL PROS ===== -->
@@ -288,8 +293,21 @@
         <div class="t">Local professionals &amp; services</div>
         <div class="d">A trusted marketplace of nearby pros — each rated and reviewed by real neighbors, so you hire with confidence.</div>
       </div>
+      <button class="dlbtn" onclick="dl(this,'neighbors-local-pros.png')">⬇ Download PNG</button>
     </div>
 
   </div>
+
+  <script>
+    function dl(btn,name){
+      var phone=btn.closest('.col').querySelector('.phone');
+      var orig=btn.textContent; btn.textContent='Rendering…'; btn.disabled=true;
+      html2canvas(phone,{scale:3,backgroundColor:null,useCORS:true}).then(function(c){
+        var a=document.createElement('a');a.href=c.toDataURL('image/png');a.download=name;
+        document.body.appendChild(a);a.click();a.remove();
+        btn.textContent=orig; btn.disabled=false;
+      }).catch(function(e){ btn.textContent='Error — try again'; btn.disabled=false; });
+    }
+  </script>
 </body>
 </html>
